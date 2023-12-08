@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/Cody-Kao/default/handlers"
-	"github.com/Cody-Kao/hello/fileTemplates/handlers"
 	"github.com/gorilla/mux"
 )
 
