@@ -8,5 +8,5 @@ import (
 
 func main() {
 	server := server.CreateServer()
-	log.Fatal(server.ListenAndServe)
+	log.Fatal(server.ListenAndServe())
 }
