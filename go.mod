@@ -1,4 +1,4 @@
-module github.com/Cody-Kao/hello
+module github.com/Cody-Kao/template
 
 go 1.21.1
 
