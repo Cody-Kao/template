@@ -1,10 +1,15 @@
-package server
+package fileTemplates
+
+import "fmt"
+
+func serverContent(modName string) (string, string) {
+	return "server/server.go", fmt.Sprintf(`package server
 
 import (
 	"net/http"
 	"time"
 
-	"github.com/Cody-Kao/default/handlers"
+	"%s/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -23,4 +28,6 @@ func CreateServer() *http.Server {
 	}
 
 	return &server
+}
+	`, modName)
 }

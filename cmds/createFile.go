@@ -5,11 +5,9 @@ package cmds
 
 import (
 	"fmt"
-	"io"
 	"os"
-	"os/exec"
-	"path/filepath"
 
+	f "github.com/Cody-Kao/template/fileTemplates"
 	"github.com/spf13/cobra"
 )
 
@@ -28,98 +26,48 @@ func init() {
 	// and all subcommands, e.g.:
 	// greetCmd.PersistentFlags().String("foo", "", "A help for foo")
 
-	greetCmd.Flags().StringP("modName", "m", "default", "type a module name for mod init")
-}
-
-func runInitModCommand(cmd *cobra.Command) {
-	moduleName, _ := cmd.Flags().GetString("modName")
-	fmt.Println(moduleName)
-
-	// Run 'go mod init' command
-	cmdGoModInit := exec.Command("go", "mod", "init", moduleName)
-	cmdGoModInit.Stdout = os.Stdout
-	cmdGoModInit.Stderr = os.Stderr
-
-	err := cmdGoModInit.Run()
-	if err != nil {
-		fmt.Printf("Error running 'go mod init': %v\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Printf("Go module initialized with name '%s'\n", moduleName)
+	// greetCmd.Flags().StringP("modName", "m", "default", "type a module name for mod init")
 }
 
 func generateTemplate(cmd *cobra.Command, args []string) {
-	// Create a directory for the Gin template
-	templateDir := "gin-template"
-	err := os.Mkdir(templateDir, os.ModePerm)
+	// initialize the Creator
+	c := f.CreatorInit()
+
+	// 創造project name跟 name of mod file
+	err := c.SetUpProjectNameAndModuleName()
 	if err != nil {
 		fmt.Printf("Error creating directory: %v\n", err)
 		os.Exit(1)
 	}
 
-	// Specify the source directory containing template files
-	sourceDir := "fileTemplates" // Replace with the actual path to your source folder
-
-	// Copy all files and subdirectories from the source directory to the template directory
-	err = copyFolderContents(sourceDir, templateDir)
+	// run go mod init
+	err = c.RunInitModCommand()
 	if err != nil {
-		fmt.Printf("Error copying template files: %v\n", err)
+		fmt.Printf("Error running 'go mod init': %v\n", err)
 		os.Exit(1)
 	}
-	runInitModCommand(cmd)
-	fmt.Println("Gin template generated successfully!")
-}
 
-func copyFolderContents(src, dest string) error {
-	entries, err := os.ReadDir(src)
+	// create files
+	err = c.CreateFiles(cmd)
 	if err != nil {
-		return err
+		fmt.Printf("Error creating template files: %v\n", err)
+		os.Exit(1)
 	}
+	fmt.Println("templates generated successfully!")
 
-	for _, entry := range entries {
-		sourcePath := filepath.Join(src, entry.Name())
-		destPath := filepath.Join(dest, entry.Name())
+	// 記得註冊會使用到的所有外部package
+	c.AddPackage("github.com/gorilla/mux")
 
-		if entry.IsDir() {
-			// Recursively copy subdirectories
-			err := os.Mkdir(destPath, os.ModePerm)
-			if err != nil {
-				fmt.Printf("Error creating directory: %v\n", err)
-				os.Exit(1)
-			}
-			err = copyFolderContents(sourcePath, destPath)
-			if err != nil {
-				return err
-			}
-		} else {
-			// Copy individual files
-			err = copyFile(sourcePath, destPath)
-			if err != nil {
-				return err
-			}
-		}
-	}
+	// 建立完檔案並且註冊所有外部package之後就能執行go get [package name]
+	err = c.GetPackages()
 
-	return nil
-}
-
-func copyFile(src, dest string) error {
-	source, err := os.Open(src)
 	if err != nil {
-		return err
+		fmt.Printf("Error getting packages: %v\n", err)
+		os.Exit(1)
 	}
-	defer source.Close()
 
-	destination, err := os.Create(dest)
-	if err != nil {
-		return err
-	}
-	defer destination.Close()
+	fmt.Println("getting packages successfully!")
 
-	_, err = io.Copy(destination, source)
-	if err != nil {
-		return err
-	}
-	return nil
+	// 完成!
+	fmt.Println("Done!")
 }
