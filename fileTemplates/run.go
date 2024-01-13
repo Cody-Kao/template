@@ -116,15 +116,14 @@ func (c *Creator) GetPackages() error {
 }
 
 func (c *Creator) CreateFiles(cmd *cobra.Command) error {
-	moduleName, _ := cmd.Flags().GetString("modName")
-	addr, content := mainContent(moduleName)
+	addr, content := mainContent(c.moduleName)
 	destinationPath := filepath.Join(c.folderPath, addr)
 	err := createFoldersAndFiles(destinationPath, content)
 	if err != nil {
 		return err
 	}
 
-	addr, content = serverContent(moduleName)
+	addr, content = serverContent(c.moduleName)
 	destinationPath = filepath.Join(c.folderPath, addr)
 	err = createFoldersAndFiles(destinationPath, content)
 	if err != nil {

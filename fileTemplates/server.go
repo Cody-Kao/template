@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"%shandlers"
+	"%s/handlers"
 	"github.com/gorilla/mux"
 )
 
