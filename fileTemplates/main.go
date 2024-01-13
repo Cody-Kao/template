@@ -7,7 +7,7 @@ func mainContent(modName string) (string, string) {
 
 import (
 	"log"
-	"%s/server"
+	"%sserver"
 )
 
 func main() {

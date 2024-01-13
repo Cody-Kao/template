@@ -168,3 +168,19 @@ func createFoldersAndFiles(destinationPath string, content string) error {
 	fmt.Printf("file %s is successfully created\n", destinationPath)
 	return nil
 }
+
+func (c *Creator) OpenProject() error {
+	// Run 'code .' command
+	cmdGoModInit := exec.Command("code", ".")
+	// Set the working directory for the command
+	cmdGoModInit.Dir = c.folderPath
+	cmdGoModInit.Stdout = os.Stdout
+	cmdGoModInit.Stderr = os.Stderr
+
+	err := cmdGoModInit.Run()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

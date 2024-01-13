@@ -70,4 +70,12 @@ func generateTemplate(cmd *cobra.Command, args []string) {
 
 	// 完成!
 	fmt.Println("Done!")
+
+	err = c.OpenProject()
+	if err != nil {
+		fmt.Printf("Error opening project: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Now, You Can Build Your Project!")
 }
