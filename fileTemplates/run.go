@@ -7,6 +7,7 @@ import (
 	"os/user"
 	"path/filepath"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -14,6 +15,7 @@ type Creator struct {
 	folderPath string
 	moduleName string
 	packages   []string
+	frameWork  FrameWork
 }
 
 func CreatorInit() *Creator {
@@ -72,6 +74,22 @@ func (c *Creator) SetUpProjectNameAndModuleName() error {
 	return nil
 }
 
+func (c *Creator) SelectFrameWork() error {
+	var framework string
+	prompt := &survey.Select{
+		Message: "This is question1 Select the programming language:",
+		Options: append(Options, "End"),
+	}
+	survey.AskOne(prompt, &framework)
+	if framework == "End" {
+		return fmt.Errorf("terminated by user")
+	}
+
+	c.frameWork = FrameWorkMap[framework]
+	fmt.Printf("You Choose language %s\n", FrameWorkMap[framework])
+	return nil
+}
+
 func (c *Creator) RunInitModCommand() error {
 	fmt.Println("project path: ", c.folderPath)
 
@@ -123,16 +141,7 @@ func (c *Creator) CreateFiles(cmd *cobra.Command) error {
 		return err
 	}
 
-	addr, content = serverContent(c.moduleName)
-	destinationPath = filepath.Join(c.folderPath, addr)
-	err = createFoldersAndFiles(destinationPath, content)
-	if err != nil {
-		return err
-	}
-
-	addr, content = handlerContent()
-	destinationPath = filepath.Join(c.folderPath, addr)
-	err = createFoldersAndFiles(destinationPath, content)
+	err = c.frameWork.Create(c.moduleName, c.folderPath)
 	if err != nil {
 		return err
 	}

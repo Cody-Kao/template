@@ -2,7 +2,13 @@ package fileTemplates
 
 import "fmt"
 
-func serverContent(modName string) (string, string) {
+type Server interface {
+	serverContent(string) (string, string)
+}
+
+type NetHttpServer struct{}
+
+func (n *NetHttpServer) serverContent(modName string) (string, string) {
 	return "server/server.go", fmt.Sprintf(`package server
 
 import (

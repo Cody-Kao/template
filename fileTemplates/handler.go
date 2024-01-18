@@ -1,6 +1,12 @@
 package fileTemplates
 
-func handlerContent() (string, string) {
+type Handler interface {
+	HandlerContent() (string, string)
+}
+
+type NetHttpHandler struct{}
+
+func (n *NetHttpHandler) HandlerContent() (string, string) {
 	return "handlers/handler.go", `package handlers
 
 import (

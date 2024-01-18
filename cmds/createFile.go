@@ -40,6 +40,13 @@ func generateTemplate(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
+	// select framework
+	err = c.SelectFrameWork()
+	if err != nil {
+		fmt.Printf("Error selecting framework: %v\n", err)
+		os.Exit(1)
+	}
+
 	// run go mod init
 	err = c.RunInitModCommand()
 	if err != nil {
