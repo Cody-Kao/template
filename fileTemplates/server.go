@@ -9,7 +9,7 @@ type Server interface {
 type NetHttpServer struct{}
 
 func (n *NetHttpServer) serverContent(modName string) (string, string) {
-	return "server/server.go", fmt.Sprintf(`package server
+	return "servers/server/server.go", fmt.Sprintf(`package server
 
 import (
 	"net/http"

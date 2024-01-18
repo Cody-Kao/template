@@ -15,7 +15,7 @@ type Creator struct {
 	folderPath string
 	moduleName string
 	packages   []string
-	frameWork  FrameWork
+	frameWork  *FrameWork
 }
 
 func CreatorInit() *Creator {
@@ -77,7 +77,7 @@ func (c *Creator) SetUpProjectNameAndModuleName() error {
 func (c *Creator) SelectFrameWork() error {
 	var framework string
 	prompt := &survey.Select{
-		Message: "This is question1 Select the programming language:",
+		Message: "Please choose a framework:",
 		Options: append(Options, "End"),
 	}
 	survey.AskOne(prompt, &framework)
@@ -86,7 +86,7 @@ func (c *Creator) SelectFrameWork() error {
 	}
 
 	c.frameWork = FrameWorkMap[framework]
-	fmt.Printf("You Choose language %s\n", FrameWorkMap[framework])
+	fmt.Printf("You Choose Framework %s\n", framework)
 	return nil
 }
 
@@ -133,47 +133,12 @@ func (c *Creator) GetPackages() error {
 	return nil
 }
 
-func (c *Creator) CreateFiles(cmd *cobra.Command) error {
-	addr, content := mainContent(c.moduleName)
-	destinationPath := filepath.Join(c.folderPath, addr)
-	err := createFoldersAndFiles(destinationPath, content)
+func (c *Creator) Create(cmd *cobra.Command) error {
+	err := c.frameWork.StartCreate(c.moduleName, c.folderPath)
 	if err != nil {
 		return err
 	}
 
-	err = c.frameWork.Create(c.moduleName, c.folderPath)
-	if err != nil {
-		return err
-	}
-
-	addr, content = templateContent()
-	destinationPath = filepath.Join(c.folderPath, addr)
-	err = createFoldersAndFiles(destinationPath, content)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func createFoldersAndFiles(destinationPath string, content string) error {
-	parentDir := filepath.Dir(destinationPath) // filepath.Dir會把path的最後一項去掉，只保留前段，等於是創造parent directory的意思
-	err := os.Mkdir(parentDir, os.ModePerm)
-	if err != nil && !os.IsExist(err) {
-		return err
-	}
-	fmt.Printf("parent path %s is successfully created\n", parentDir)
-	file, err := os.Create(destinationPath)
-	if err != nil {
-		return err
-	}
-	_, err = file.Write([]byte(content))
-	if err != nil {
-		return err
-	}
-	file.Close()
-
-	fmt.Printf("file %s is successfully created\n", destinationPath)
 	return nil
 }
 

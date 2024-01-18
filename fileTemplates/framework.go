@@ -1,42 +1,44 @@
 package fileTemplates
 
-import (
-	"fmt"
-	"path/filepath"
-)
-
 var Options []string = []string{"net/http", "chi", "gin", "echo", "fiber"}
 
-var FrameWorkMap map[string]FrameWork = map[string]FrameWork{"net/http": NetHttpInit()}
+var FrameWorkMap map[string]*FrameWork = map[string]*FrameWork{"net/http": NetHttpInit()}
 
-type FrameWork interface {
-	Create(string, string) error
+// create a base class, and then using class composition to behaive differently
+type FrameWork struct {
+	Main     Main
+	Handler  Handler
+	Server   Server
+	Template Template
 }
 
-type NetHttp struct {
-	Handler Handler
-	Server  Server
-}
-
-func NetHttpInit() *NetHttp {
-	return &NetHttp{Handler: &NetHttpHandler{}, Server: &NetHttpServer{}}
-}
-
-func (n *NetHttp) Create(moduleName string, folderPath string) error {
-	fmt.Println("NetHttp Creates!")
-	addr, content := n.Handler.HandlerContent()
-	destinationPath := filepath.Join(folderPath, addr)
-	err := createFoldersAndFiles(destinationPath, content)
+func (f *FrameWork) StartCreate(moduleName string, folderPath string) error {
+	addr, content := f.Main.MainContent(moduleName)
+	err := CreateFoldersAndFiles(moduleName, folderPath, addr, content)
+	if err != nil {
+		return err
+	}
+	addr, content = f.Handler.HandlerContent()
+	err = CreateFoldersAndFiles(moduleName, folderPath, addr, content)
 	if err != nil {
 		return err
 	}
 
-	addr, content = n.Server.serverContent(moduleName)
-	destinationPath = filepath.Join(folderPath, addr)
-	err = createFoldersAndFiles(destinationPath, content)
+	addr, content = f.Server.serverContent(moduleName)
+	err = CreateFoldersAndFiles(moduleName, folderPath, addr, content)
+	if err != nil {
+		return err
+	}
+
+	addr, content = f.Template.TemplateContent()
+	err = CreateFoldersAndFiles(moduleName, folderPath, addr, content)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func NetHttpInit() *FrameWork {
+	return &FrameWork{Main: &NetHttpMain{}, Handler: &NetHttpHandler{}, Server: &NetHttpServer{}, Template: &NetHttpTemplate{}}
 }

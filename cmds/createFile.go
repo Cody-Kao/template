@@ -55,7 +55,7 @@ func generateTemplate(cmd *cobra.Command, args []string) {
 	}
 
 	// create files
-	err = c.CreateFiles(cmd)
+	err = c.Create(cmd)
 	if err != nil {
 		fmt.Printf("Error creating template files: %v\n", err)
 		os.Exit(1)

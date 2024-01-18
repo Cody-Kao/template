@@ -1,6 +1,12 @@
 package fileTemplates
 
-func templateContent() (string, string) {
+type Template interface {
+	TemplateContent() (string, string)
+}
+
+type NetHttpTemplate struct{}
+
+func (n *NetHttpTemplate) TemplateContent() (string, string) {
 	return "templates/index.html", `
 <!DOCTYPE html>
 <html lang="en">

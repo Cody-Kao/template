@@ -2,7 +2,13 @@ package fileTemplates
 
 import "fmt"
 
-func mainContent(modName string) (string, string) {
+type Main interface {
+	MainContent(string) (string, string)
+}
+
+type NetHttpMain struct{}
+
+func (n *NetHttpMain) MainContent(modName string) (string, string) {
 	return "main.go", fmt.Sprintf(`package main
 
 import (
