@@ -3,13 +3,13 @@ package fileTemplates
 import "fmt"
 
 type Server interface {
-	serverContent(string) (string, string)
+	ServerContent(string) ([]string, []string)
 }
 
 type NetHttpServer struct{}
 
-func (n *NetHttpServer) serverContent(modName string) (string, string) {
-	return "servers/server/server.go", fmt.Sprintf(`package server
+func (n *NetHttpServer) ServerContent(modName string) ([]string, []string) {
+	return []string{"server/server.go"}, []string{fmt.Sprintf(`package server
 
 import (
 	"net/http"
@@ -35,5 +35,5 @@ func CreateServer() *http.Server {
 
 	return &server
 }
-	`, modName)
+	`, modName)}
 }

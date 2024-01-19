@@ -1,13 +1,13 @@
 package fileTemplates
 
 type Template interface {
-	TemplateContent() (string, string)
+	TemplateContent() ([]string, []string)
 }
 
 type NetHttpTemplate struct{}
 
-func (n *NetHttpTemplate) TemplateContent() (string, string) {
-	return "templates/index.html", `
+func (n *NetHttpTemplate) TemplateContent() ([]string, []string) {
+	return []string{"templates/index.html"}, []string{`
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,5 +19,5 @@ func (n *NetHttpTemplate) TemplateContent() (string, string) {
 	<h1>Hello World</h1>
 </body>
 </html>
-	`
+	`}
 }

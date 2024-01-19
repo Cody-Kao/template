@@ -47,6 +47,13 @@ func generateTemplate(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
+	// run git init
+	err = c.RunGitInit()
+	if err != nil {
+		fmt.Printf("Error running git init: %v\n", err)
+		os.Exit(1)
+	}
+
 	// run go mod init
 	err = c.RunInitModCommand()
 	if err != nil {

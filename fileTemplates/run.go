@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"os/user"
 	"path/filepath"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -23,24 +22,6 @@ func CreatorInit() *Creator {
 	return c
 }
 
-func getUserDeskTop() (string, error) {
-	currentUser, err := user.Current()
-	if err != nil {
-		return "", err
-	}
-
-	// 創造使用者桌面路徑
-	desktopPath := filepath.Join(currentUser.HomeDir, "Desktop")
-
-	// 檢查該路徑是否存在
-	_, err = os.Stat(desktopPath)
-	if os.IsNotExist(err) {
-		return "", err
-	}
-
-	return desktopPath, nil
-}
-
 func (c *Creator) SetUpProjectNameAndModuleName() error {
 	// 創造使用者想要的專案名稱
 	var templateName string
@@ -51,7 +32,7 @@ func (c *Creator) SetUpProjectNameAndModuleName() error {
 	}
 
 	// 把使用者的桌面路徑找出，這樣才能把檔案建立在桌面
-	addr, err := getUserDeskTop()
+	addr, err := GetUserDeskTop()
 	if err != nil {
 		return err
 	}
@@ -87,6 +68,23 @@ func (c *Creator) SelectFrameWork() error {
 
 	c.frameWork = FrameWorkMap[framework]
 	fmt.Printf("You Choose Framework %s\n", framework)
+	return nil
+}
+
+func (c *Creator) RunGitInit() error {
+	// Run 'git init' command
+	cmdGitInit := exec.Command("git", "init")
+	// Set the working directory for the command
+	cmdGitInit.Dir = c.folderPath
+	cmdGitInit.Stdout = os.Stdout
+	cmdGitInit.Stderr = os.Stderr
+
+	err := cmdGitInit.Run()
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("git init execute successfully")
 	return nil
 }
 
